@@ -337,10 +337,10 @@ class WebVTT:
         raise ValueError(f'Format {format} is not supported.')
 
     def iter_slice(
-            self,
-            start: typing.Optional[str] = None,
-            end: typing.Optional[str] = None
-            ) -> typing.Generator[Caption, None, None]:
+        self,
+        start: typing.Optional[typing.Union[str, Timestamp]] = None,
+        end: typing.Optional[typing.Union[str, Timestamp]] = None,
+    ) -> typing.Generator[Caption, None, None]:
         """
         Iterate a slice of the captions based on a time range.
 
@@ -348,9 +348,16 @@ class WebVTT:
         :param end: end timestamp of the range
         :returns: generator of Captions
         """
-        start_time = Timestamp.from_string(start) if start else None
-        end_time = Timestamp.from_string(end) if end else None
-
+        start_time = (
+            (start if isinstance(start, Timestamp) else Timestamp.from_string(start))
+            if start
+            else None
+        )
+        end_time = (
+            (end if isinstance(end, Timestamp) else Timestamp.from_string(end))
+            if end
+            else None
+        )
         for caption in self.captions:
             if (
                     (not start_time or caption.start_time >= start_time) and
